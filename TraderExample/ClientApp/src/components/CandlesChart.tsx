@@ -1,4 +1,4 @@
-import React, {ReactElement} from "react";
+import React, {ReactElement, useState} from "react";
 import {ChartCanvas, Chart} from "react-stockcharts";
 import {
     CandlestickSeries,
@@ -19,6 +19,24 @@ const dateFormat = timeFormat("%d-%m-%Y %H:%M");
 const numberFormat = format(".4f");
 
 const CandlesChart = fitWidth(({}, {}): ReactElement => {
+
+    const [value, setValue] = useState(0);
+
+    for (let i = 9; i < 150; i++) {
+        const randomValue = Math.floor((Math.random() * 30) + 5);
+        setTimeout(() => {
+            candles.push({
+                date: new Date(),
+                open: candles[i].close,
+                high: candles[i].close + randomValue + 5,
+                low: candles[i].close - randomValue - 5,
+                close: i % 2 === 0 ? candles[i].close + randomValue :  candles[i].close - randomValue,
+                volume: 5
+            });
+            setValue(i);
+        }, 1000 * i)
+    }
+    
     const xScaleProvider = discontinuousTimeScaleProvider
         .inputDateAccessor(d => d.date);
     const {
@@ -26,8 +44,8 @@ const CandlesChart = fitWidth(({}, {}): ReactElement => {
         xScale,
         xAccessor,
         displayXAccessor,
-    } = xScaleProvider(staticCandles);
-
+    } = xScaleProvider(candles);
+    
     return (
         <ChartCanvas
             height={600}
@@ -87,7 +105,7 @@ const tooltipContent = (ys) => {
     };
 };
 
-const staticCandles: CandleData[] = [
+const candles: CandleData[] = [
     {
         date: new Date(),
         open: 100,
